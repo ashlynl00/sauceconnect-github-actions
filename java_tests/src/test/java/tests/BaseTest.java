@@ -17,8 +17,10 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.URL;
+//import static tests.Config.
 
 import static tests.Config.*;
+import static tests.Config.sauceParent;
 
 public class BaseTest {
 
@@ -59,6 +61,22 @@ public class BaseTest {
                     ChromeOptions browserOptions = new ChromeOptions();
                     driver = new ChromeDriver();
                 }
+            } else if (host.equals("saucelabs-tunnel")) {
+                MutableCapabilities sauceOptions = new MutableCapabilities();
+                sauceOptions.setCapability("username", sauceUser);
+                sauceOptions.setCapability("accessKey", sauceKey);
+                sauceOptions.setCapability("name", testName);
+                sauceOptions.setCapability("tunnelIdentifier", sauceTunnel);
+                sauceOptions.setCapability("parentTunnel", sauceParent);
+                MutableCapabilities capabilities = new MutableCapabilities();
+                capabilities.setCapability("browserName", browserName);
+                capabilities.setCapability("browserVersion", browserVersion);
+                capabilities.setCapability("platformName", platformName);
+                capabilities.setCapability("sauce:options", sauceOptions);
+                String sauceUrl = String.format("https://ondemand.saucelabs.com/wd/hub");
+                driver = new RemoteWebDriver(new URL(sauceUrl), capabilities);
+                sessionId = ((RemoteWebDriver) driver).getSessionId().toString();
+                sauceClient = new SauceREST(sauceUser, sauceKey, DataCenter.US);
             }
         }
 
